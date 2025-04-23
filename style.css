@@ -1,0 +1,143 @@
+/* Paleta: fondo gris oscuro, texto blanco, acentos en verde */
+
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    padding: 2rem;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#titulo {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #f0f0f0;
+}
+
+.formSection {
+    background-color: #2c2c2c;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.formSection h2 {
+    margin-bottom: 1rem;
+    color: #90ee90;
+}
+
+.textLabel {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.textInput,
+.textArea {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #3a3a3a;
+    color: #ffffff;
+    font-size: 1rem;
+}
+
+.textInput:focus,
+.textArea:focus {
+    outline: none;
+    background-color: #505050;
+}
+
+.textArea {
+    height: 120px;
+    resize: vertical;
+}
+
+.btnSuccess {
+    padding: 0.75rem 1.5rem;
+    background-color: #2ecc71;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btnSuccess:hover {
+    background-color: #27ae60;
+}
+
+.enviadosHeader {
+    display: flex;
+    justify-content: space-between;
+    background-color: #3a3a3a;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: bold;
+    color: #cccccc;
+}
+
+select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #3a3a3a;
+    color: #ffffff;
+    font-size: 1rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+}
+
+select:focus {
+    outline: none;
+    background-color: #505050;
+}
+
+
+/* Tabla de mensajes enviados */
+#mensajesEnviados {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #2c2c2c;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#mensajesEnviados thead {
+    background-color: #3a3a3a;
+    color: #90ee90;
+}
+
+#mensajesEnviados th,
+#mensajesEnviados td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #444;
+    text-align: left;
+    color: #ddd;
+}
+
+#mensajesEnviados tr:last-child td {
+    border-bottom: none;
+}
