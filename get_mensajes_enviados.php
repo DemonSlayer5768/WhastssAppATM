@@ -1,6 +1,5 @@
 <?php
 require_once 'database.php';
-
 header('Content-Type: application/json');
 
 try {
@@ -13,7 +12,7 @@ try {
         exit;
     }
 
-    // Consulta con JOIN para traer el nombre de la plantilla
+    // Consulta con alias correcto (m)
     $sql = "SELECT 
                 m.num_destino, 
                 m.adjunto, 
@@ -29,8 +28,6 @@ try {
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $mensajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
 
     echo json_encode($mensajes);
 } catch (Exception $e) {

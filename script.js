@@ -1,153 +1,58 @@
-console.log("si entro");
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Función reutilizable para enviar formulario por fetch
-    function enviarFormulario(formulario, url) {
-        const formData = new FormData(formulario);
-
-        fetch(url, {
-            method: "POST",
-            body: formData,
-        })
-            .then(response => response.text())
-            .then(data => {
-                console.log("Respuesta del servidor:", data);
-                alert(data); // Mostrar al usuario
-                formulario.reset(); // Limpiar formulario después de enviar
-            })
-            .catch(error => {
-                console.error("Error al enviar el formulario:", error);
-                alert("Ocurrió un error. Revisa la consola.");
-            });
-    }
-
-    // Crear Cuenta
-    const formCrearCuenta = document.querySelector('form[action="crear_cuenta.php"]');
-    formCrearCuenta.addEventListener("submit", function (event) {
-        event.preventDefault();
-        enviarFormulario(formCrearCuenta, "crear_cuenta.php");
-    });
-
-    // Crear Plantilla
-    const formCrearPlantilla = document.querySelector('form[action="crear_plantilla.php"]');
-    formCrearPlantilla.addEventListener("submit", function (event) {
-        event.preventDefault();
-        enviarFormulario(formCrearPlantilla, "crear_plantilla.php");
-    });
-
-    // Enviar Mensaje
-    const formEnviarMensaje = document.querySelector('form[action="enviar_mensaje.php"]');
-    formEnviarMensaje.addEventListener("submit", function (event) {
-        event.preventDefault();
-        enviarFormulario(formEnviarMensaje, "enviar_mensaje.php");
-    });
-
-
-    const select = document.getElementById("selectPlantillas");
-
-    fetch("get_plantillas.php")
-        .then((res) => res.json())
-        .then((data) => {
-            data.forEach((plantilla) => {
-                const option = document.createElement("option");
-                option.value = plantilla.id;
-                option.textContent = plantilla.nombre;
-                select.appendChild(option);
-            });
-        })
-        .catch((err) => {
-            console.error("Error al cargar las plantillas:", err);
-        });
-
-
-    const tablaMensajes = document.getElementById("mensajesEnviados").querySelector("tbody");
-
-    fetch("get_mensajes_enviados.php")
-        .then(res => res.json())
+document.addEventListener("DOMContentLoaded", function () {
+    // Cargar las cuentas en el select de cuentas
+    const selectCuentas = document.getElementById("selectCuentas");
+    fetch("get_cuentas.php") // Este archivo PHP debe devolver las cuentas en formato JSON
+        .then(response => response.json())
         .then(data => {
-            tablaMensajes.innerHTML = ""; // Limpiar la tabla antes de agregar filas
-            data.forEach(mensaje => {
-                const fila = document.createElement("tr");
-
-                fila.innerHTML = `
-                        <td>${mensaje.num_destino}</td>
-                        <td>${mensaje.adjunto}</td>
-                        <td>${mensaje.asunto}</td>
-                        <td>${mensaje.plantilla_nombre ?? "Sin plantilla"}</td>
-                    `;
-
-                tablaMensajes.appendChild(fila);
+            data.forEach(cuenta => {
+                const option = document.createElement("option");
+                option.value = cuenta.id; // Asume que 'id' es la propiedad de la cuenta
+                option.textContent = cuenta.nombre; // 'nombre' es el nombre de la cuenta
+                selectCuentas.appendChild(option);
             });
         })
         .catch(error => {
-            console.error("Error al cargar los mensajes enviados:", error);
+            console.error("Error al cargar las cuentas:", error);
         });
 
-    const selectCuentas = document.addEventListener("DOMContentLoaded", function () {
-        fetch("get_cuentas.php")
-            .then(response => response.json())
+    // Cargar las plantillas en el select de plantillas
+    const selectPlantillas = document.getElementById("selectPlantillas");
+    fetch("get_plantillas.php") // Este archivo PHP debe devolver las plantillas en formato JSON
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(plantilla => {
+                const option = document.createElement("option");
+                option.value = plantilla.id; // Asume que 'id' es la propiedad de la plantilla
+                option.textContent = plantilla.nombre; // 'nombre' es el nombre de la plantilla
+                selectPlantillas.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error("Error al cargar las plantillas:", error);
+        });
+
+    // Enviar el mensaje
+    document.getElementById("formEnviarMensaje").addEventListener("submit", function (event) {
+        event.preventDefault(); // Prevenir el envío tradicional del formulario
+
+        const formData = new FormData(this); // Crear un FormData con todos los campos del formulario
+
+        fetch("enviar_mensaje.php", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json()) // Asumimos que el servidor devuelve un JSON
             .then(data => {
-                const select = document.getElementById("selectCuentas");
-                data.forEach(cuenta => {
-                    const option = document.createElement("option");
-                    option.value = cuenta.nombre; // Usamos el nombre como valor
-                    option.textContent = cuenta.nombre;
-                    select.appendChild(option);
-                });
+                if (data.status === "success") {
+                    alert("Mensaje enviado correctamente.");
+                    // Puedes realizar acciones adicionales, como limpiar el formulario o actualizar la lista
+                } else {
+                    alert("Error: " + data.message);
+                }
             })
-            .catch(error => console.error("Error al cargar cuentas:", error));
+            .catch(error => {
+                console.error("Error al enviar el mensaje:", error);
+                alert("Hubo un problema al enviar el mensaje.");
+            });
     });
-
 });
-
-
-
-
-
-
-
-// document.addEventListener("DOMContentLoaded", () => {
-//     // Formulario: Crear Cuenta
-//     const formCrearCuenta = document.querySelector('form[action="crear_cuenta.php"]');
-//     formCrearCuenta.addEventListener("submit", function (event) {
-//         event.preventDefault(); // Evita que el formulario se envíe
-
-//         const nombre = formCrearCuenta.querySelector('input[name="nombre"]').value;
-//         const numero = formCrearCuenta.querySelector('input[name="numero"]').value;
-
-//         console.log("Crear Cuenta:");
-//         console.log("Nombre:", nombre);
-//         console.log("Número:", numero);
-
-//         // Aquí podrías hacer un fetch/AJAX para enviar los datos
-//     });
-
-//     // Formulario: Crear Plantilla
-//     const formCrearPlantilla = document.querySelector('form[action="crear_plantilla.php"]');
-//     formCrearPlantilla.addEventListener("submit", function (event) {
-//         event.preventDefault();
-
-//         const plantilla = formCrearPlantilla.querySelector('input[name="plantilla"]').value;
-//         const mensaje = formCrearPlantilla.querySelector('textarea[name="mensaje"]').value;
-
-//         console.log("Crear Plantilla:");
-//         console.log("Plantilla:", plantilla);
-//         console.log("Mensaje:", mensaje);
-//     });
-
-//     // Formulario: Enviar Mensaje
-//     const formEnviarMensaje = document.querySelector('form[action="enviar_mensaje.php"]');
-//     formEnviarMensaje.addEventListener("submit", function (event) {
-//         event.preventDefault();
-
-//         const numeroDestino = formEnviarMensaje.querySelector('input[name="num_destino"]').value;
-//         const plantillaId = formEnviarMensaje.querySelector('select[name="plantilla_id"]').value;
-//         const mensaje = formEnviarMensaje.querySelector('textarea[name="mensaje"]').value;
-
-//         console.log("Enviar Mensaje:");
-//         console.log("Número Destino:", numeroDestino);
-//         console.log("Plantilla ID:", plantillaId);
-//         console.log("Mensaje:", mensaje);
-//     });
-// });

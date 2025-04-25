@@ -1,3 +1,4 @@
+
 <?php
 require_once 'database.php';
 
@@ -13,7 +14,7 @@ try {
         exit;
     }
 
-    $sql = "SELECT id, nombre FROM whats_cuentas ORDER BY nombre ASC";
+    $sql = "SELECT id, nombre, numero_telefono FROM whats_cuentas ORDER BY nombre ASC";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 
@@ -21,5 +22,5 @@ try {
     echo json_encode($cuentas);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(["error" => "Error al obtener las plantillas: " . $e->getMessage()]);
+    echo json_encode(["error" => "Error al obtener las cuentas: " . $e->getMessage()]);
 }

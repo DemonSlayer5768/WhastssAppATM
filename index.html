@@ -41,21 +41,19 @@
             </form>
         </section>
 
-        <!-- Mensaje directo -->
+        <!-- Enviar Mensajes -->
         <section class="formSection">
-            <form action="enviar_mensaje.php" method="post" enctype="multipart/form-data">
-
+            <form id="formEnviarMensaje" method="POST" enctype="multipart/form-data">
                 <h2>Enviar Mensaje</h2>
                 <label class="textLabel">Asunto</label>
-                <Input class="textInput" type="text" name="asunto" required />
-                <h2>Mensaje Plantilla</h2>
+                <input class="textInput" type="text" name="asunto" required />
 
-                <label class="textLabel">Seleccinar cuenta</label>
+                <label class="textLabel">Seleccionar cuenta</label>
                 <select name="cuentas_id" id="selectCuentas">
                     <option value="">Seleccione una cuenta</option>
                 </select>
 
-                <label class="textLabel"> SELECCIONAR PLANTILLA</label>
+                <label class="textLabel">Seleccionar plantilla</label>
                 <select name="plantilla_id" id="selectPlantillas">
                     <option value="">Selecciona una plantilla</option>
                 </select>
@@ -64,19 +62,15 @@
                 <label class="textLabel">Número destino</label>
                 <input class="textInput" type="text" name="num_destino" />
 
-
-
                 <label class="textLabel">Mensaje</label>
                 <textarea class="textArea" name="mensaje"></textarea>
 
                 <label class="textLabel">Archivo Adjunto</label>
                 <input class="textInput" type="file" name="archivoAdjunto[]" multiple />
 
-
                 <button class="btnSuccess" type="submit">Enviar Mensaje</button>
             </form>
         </section>
-
 
         <!-- MENSAJES ENVIADOS -->
         <section class="formSection">
@@ -91,13 +85,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <!-- <td>+52 1234567890</td>
-                        <td>archivo.pdf</td>
-                        <td>Promoción</td>
-                        <td>Plantilla 1</td> -->
-                    </tr>
-                    <!-- más filas aquí -->
+                    <!-- Aquí se llenarán los mensajes -->
                 </tbody>
             </table>
         </section>
