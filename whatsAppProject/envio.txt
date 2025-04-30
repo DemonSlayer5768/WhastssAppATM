@@ -1,0 +1,138 @@
+<?php
+require_once 'database.php';
+require __DIR__ . '/vendor/autoload.php';
+header('Content-Type: application/json');
+
+// Configuración de errores
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/php_errors.log');
+
+try {
+    // Carga y validación de variables de entorno
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+    $dotenv->required(['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID']);
+
+    $token = $_ENV['WHATSAPP_API_TOKEN'];
+    $phoneNumberId = $_ENV['WHATSAPP_PHONE_NUMBER_ID'];
+
+    // Conexión a base de datos
+    $database = new Database();
+    $conn = $database->getConnection();
+
+    // Validación de entrada
+    $requiredFields = ['plantilla_id', 'cuenta_id'];
+    foreach ($requiredFields as $field) {
+        if (empty($_POST[$field])) {
+            throw new Exception("El campo $field es requerido", 400);
+        }
+    }
+
+    $plantilla_id = (int)$_POST['plantilla_id'];
+    $cuenta_id = (int)$_POST['cuenta_id'];
+    $asunto = $_POST['asunto'] ?? '';
+
+    // Obtener datos de la base de datos
+    $getData = function ($table, $id, $field) use ($conn) {
+        $stmt = $conn->prepare("SELECT $field FROM $table WHERE id = ? LIMIT 1");
+        $stmt->execute([$id]);
+        return $stmt->fetchColumn();
+    };
+
+    $numero_telefono = preg_replace(
+        '/[^0-9]/',
+        '',
+        $getData('whats_cuentas', $cuenta_id, 'numero_telefono')
+    );
+
+    if (empty($numero_telefono)) {
+        throw new Exception("Número de teléfono no encontrado para la cuenta", 404);
+    }
+
+    $nombre_plantilla = $getData('whats_plantillas', $plantilla_id, 'nombre');
+    if (empty($nombre_plantilla)) {
+        throw new Exception("Plantilla no encontrada", 404);
+    }
+
+    // Preparar solicitud a WhatsApp API
+    $requestData = [
+        'messaging_product' => 'whatsapp',
+        'recipient_type' => 'individual',
+        'to' => $numero_telefono,
+        'type' => 'template',
+        'template' => [
+            'name' => $nombre_plantilla,
+            'language' => ['code' => 'es_MX'],
+            'components' => []
+        ]
+    ];
+
+    // Configurar y ejecutar cURL
+    $ch = curl_init();
+    $curlOptions = [
+        CURLOPT_URL => "https://graph.facebook.com/v18.0/{$phoneNumberId}/messages",
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $token,
+            'Content-Type: application/json'
+        ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode($requestData),
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1
+    ];
+    curl_setopt_array($ch, $curlOptions);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlError) {
+        throw new Exception("Error en la conexión: " . $curlError, 500);
+    }
+
+    $responseData = json_decode($response, true) ?? [];
+
+    // Registrar en base de datos
+    $messageId = $responseData['messages'][0]['id'] ?? null;
+    $status = ($httpCode === 200 && $messageId) ? 1 : 0;
+
+    $stmt = $conn->prepare("INSERT INTO whats_mensajes_plantilla 
+                          (plantilla_id, cuenta_id, asunto, created, status, message_id) 
+                          VALUES (?, ?, ?, NOW(), ?, ?)");
+    $stmt->execute([$plantilla_id, $cuenta_id, $asunto, $status, $messageId]);
+
+    // Manejar respuesta
+    if ($status === 1) {
+        echo json_encode([
+            "status" => "success",
+            "data" => [
+                "message_id" => $messageId,
+                "numero" => $numero_telefono,
+                "plantilla" => $nombre_plantilla
+            ]
+        ]);
+        return;
+    }
+
+    // Manejo de errores de API
+    $errorDetails = $responseData['error'] ?? ['message' => 'Error desconocido'];
+    throw new Exception(
+        "Error en WhatsApp API: " . $errorDetails['message'],
+        $httpCode ?: 500
+    );
+} catch (Exception $e) {
+    $statusCode = $e->getCode() >= 400 ? $e->getCode() : 500;
+    http_response_code($statusCode);
+
+    error_log("Error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+    echo json_encode([
+        "status" => "error",
+        "message" => $e->getMessage(),
+        "code" => $statusCode
+    ]);
+}

@@ -1,0 +1,60 @@
+SELECT * FROM whats_cuentas;
+SELECT * FROM whats_plantillas;
+SELECT * FROM whats_mensajes_enviados;  /*ELIMINAR*/
+SELECT * FROM whats_mensajes_directos;
+SELECT * FROM whats_mensajes_plantilla;
+
+SELECT * FROM  whats_mensajes_plantilla AS wmp
+INNER JOIN whats_cuentas AS wc ON wc.numero_telefono = wmp.id;
+
+
+ SHOW CREATE TABLE whats_plantillas;
+ SHOW CREATE TABLE whats_cuentas;
+ 
+DELETE FROM whats_mensajes_enviados; 
+DELETE FROM whats_cuentas;
+
+Describe whats_mensajes_enviados;
+describe whats_cuentas;
+describe whats_plantillas;
+
+DROP TABLE whats_mensajes_plantilla;
+
+CREATE TABLE whats_plantillas (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    cuerpo TEXT NOT NULL,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE whats_cuentas (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    numero_telefono VARCHAR(20) NOT NULL,
+    fecha_creacion TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP (),
+    PRIMARY KEY (`id`)
+);
+
+
+CREATE TABLE whats_mensajes_directos (
+id int auto_increment,
+mensaje text not null,
+numero_destino int not null,
+asunto text null,
+adjunto text null,
+created datetime not null,
+status int(1) not null , 
+primary key (id)
+);
+
+CREATE TABLE whats_mensajes_plantilla (
+id int auto_increment,
+plantilla_id int not null,
+cuenta_id int not null,
+asunto text null,
+adjunto text null,
+created datetime not null,
+status int(1) not null , 
+primary key (id)
+);
+

@@ -1,0 +1,5 @@
+[30-Apr-2025 23:38:20 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: http_response_code(): Argument #1 ($response_code) must be of type int, string given in C:\xampp\htdocs\whatsAppProject\insertar_mensaje_plantilla.php:129
+Stack trace:
+#0 C:\xampp\htdocs\whatsAppProject\insertar_mensaje_plantilla.php(129): http_response_code('42S22')
+#1 {main}
+  thrown in C:\xampp\htdocs\whatsAppProject\insertar_mensaje_plantilla.php on line 129

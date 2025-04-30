@@ -41,36 +41,51 @@
             </form>
         </section>
 
-        <!-- Enviar Mensajes -->
+        <!-- Enviar Mensajes usando Plantillas -->
         <section class="formSection">
-            <form id="formEnviarMensaje" method="POST" enctype="multipart/form-data">
-                <h2>Enviar Mensaje</h2>
+            <form method="POST" action="enviar_mensaje_plantilla.php" id="formularioMensajePlantilla"
+                enctype="multipart/form-data">
+                <h2>Mensaje Plantilla</h2>
+
                 <label class="textLabel">Asunto</label>
                 <input class="textInput" type="text" name="asunto" required />
 
-                <label class="textLabel">Seleccionar cuenta</label>
-                <select name="cuentas_id" id="selectCuentas">
-                    <option value="">Seleccione una cuenta</option>
-                </select>
+                <label for="selectCuentas">Cuenta:</label>
+                <select id="selectCuentas" name="cuenta_id" required></select>
 
-                <label class="textLabel">Seleccionar plantilla</label>
-                <select name="plantilla_id" id="selectPlantillas">
-                    <option value="">Selecciona una plantilla</option>
-                </select>
-
-                <h2>Mensaje Directo</h2>
-                <label class="textLabel">Número destino</label>
-                <input class="textInput" type="text" name="num_destino" />
-
-                <label class="textLabel">Mensaje</label>
-                <textarea class="textArea" name="mensaje"></textarea>
+                <label for="selectPlantillas">Plantilla:</label>
+                <select id="selectPlantillas" name="plantilla_id" required></select>
 
                 <label class="textLabel">Archivo Adjunto</label>
                 <input class="textInput" type="file" name="archivoAdjunto[]" multiple />
 
-                <button class="btnSuccess" type="submit">Enviar Mensaje</button>
+                <button class="btnSuccess" type="submit">Enviar Mensaje Plantilla</button>
             </form>
         </section>
+
+        <!-- Enviar Mensajes Directos -->
+        <section class="formSection">
+            <form id="formEnviarMensajeDirecto" method="POST" enctype="multipart/form-data"
+                action="enviar_mensaje_directo.php">
+                <h2>Mensaje Directo</h2>
+
+                <label class="textLabel">Asunto</label>
+                <input class="textInput" type="text" name="asunto" required />
+
+                <label class="textLabel">Número destino</label>
+                <input class="textInput" type="text" name="numero_destino" required />
+
+                <label class="textLabel">Mensaje</label>
+                <textarea class="textArea" name="mensaje" required></textarea>
+
+                <label class="textLabel">Archivo Adjunto</label>
+                <input class="textInput" type="file" name="archivoAdjunto[]" multiple />
+
+                <button class="btnSuccess" type="submit">Enviar Mensaje Directo</button>
+            </form>
+        </section>
+
+
 
         <!-- MENSAJES ENVIADOS -->
         <section class="formSection">
