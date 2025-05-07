@@ -1,9 +1,9 @@
 <?php
-require_once 'conexion.php'; // tu archivo de conexión
+require_once 'conexion.php'; // exion db
 
 header('Content-Type: application/json');
 
-$id_mensaje = $_GET['id'] ?? null;
+$id_template = $_GET['id'] ?? null;
 
 if (!$id_mensaje) {
     echo json_encode(["status" => "error", "message" => "ID de mensaje no proporcionado."]);
@@ -11,9 +11,9 @@ if (!$id_mensaje) {
 }
 
 // Buscar datos del mensaje
-$query = "SELECT plantilla_id, cuenta_id FROM whats_mensajes_plantilla WHERE id = ?";
+$query = "SELECT id, cuerpo FROM whats_templates WHERE id = ?";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("i", $id_mensaje);
+$stmt->bind_param("i", $id_template);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -23,23 +23,8 @@ if ($result->num_rows === 0) {
 }
 
 $row = $result->fetch_assoc();
-$plantilla_id = $row['plantilla_id'];
-$cuenta_id = $row['cuenta_id'];
+$id_template = $row['cuerpo'];
 
-// Buscar el número
-$queryCuenta = "SELECT numero_telefono FROM whats_cuentas WHERE id = ?";
-$stmtCuenta = $conn->prepare($queryCuenta);
-$stmtCuenta->bind_param("i", $cuenta_id);
-$stmtCuenta->execute();
-$resultCuenta = $stmtCuenta->get_result();
-
-if ($resultCuenta->num_rows === 0) {
-    echo json_encode(["status" => "error", "message" => "Cuenta no encontrada."]);
-    exit;
-}
-
-$rowCuenta = $resultCuenta->fetch_assoc();
-$numero_telefono = $rowCuenta['numero_telefono'];
 
 // Buscar cuerpo de plantilla
 $queryPlantilla = "SELECT cuerpo FROM whats_plantillas WHERE id = ?";
@@ -54,12 +39,12 @@ if ($resultPlantilla->num_rows === 0) {
 }
 
 $rowPlantilla = $resultPlantilla->fetch_assoc();
-$cuerpo_plantilla = $rowPlantilla['cuerpo'];
+$cuerpo = $rowPlantilla['cuerpo'];
 
 // --- Enviar mensaje ---
 $data = [
     'numero_destino' => $numero_telefono,
-    'mensaje' => $cuerpo_plantilla
+    'mensaje' => $cuerpo
 ];
 
 $ch = curl_init('http://localhost/WhatsApp_Api.php');

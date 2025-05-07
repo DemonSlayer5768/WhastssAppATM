@@ -1,0 +1,5 @@
+{"messaging_product":"whatsapp","contacts":[{"input":"523325921540","wa_id":"5213325921540"}],"messages":[{"id":"wamid.HBgNNTIxMzMyNTkyMTU0MBUCABEYEjY1QTQxNzk5QkJDQ0JGRDJGMgA="}]}
+{"messaging_product":"whatsapp","contacts":[{"input":"523325921540","wa_id":"5213325921540"}],"messages":[{"id":"wamid.HBgNNTIxMzMyNTkyMTU0MBUCABEYEjc3NkVCRkM1NTJDMUM2OTFENAA="}]}
+{"messaging_product":"whatsapp","contacts":[{"input":"523325921540","wa_id":"5213325921540"}],"messages":[{"id":"wamid.HBgNNTIxMzMyNTkyMTU0MBUCABEYEjBGMDhCODhGOThCNTJDM0FBOAA="}]}
+{"messaging_product":"whatsapp","contacts":[{"input":"523325921540","wa_id":"5213325921540"}],"messages":[{"id":"wamid.HBgNNTIxMzMyNTkyMTU0MBUCABEYEjcyQTRDQzIxQkQxOUUxQ0I2MQA="}]}
+{"messaging_product":"whatsapp","contacts":[{"input":"523325921540","wa_id":"5213325921540"}],"messages":[{"id":"wamid.HBgNNTIxMzMyNTkyMTU0MBUCABEYEjc0N0ZGOEE2NTJBMkZBMjVFRgA="}]}

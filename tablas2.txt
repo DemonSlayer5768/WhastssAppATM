@@ -1,0 +1,34 @@
+SELECT * FROM whats_cuentas;
+SELECT * FROM whats_templates;
+SELECT * FROM whats_mensajes;
+
+
+CREATE TABLE whats_plantillas (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    cuerpo TEXT NOT NULL,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE whats_cuentas (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    numero_telefono VARCHAR(20) NOT NULL,
+    fecha_creacion TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP (),
+    PRIMARY KEY (`id`)
+);
+
+
+
+CREATE TABLE whats_templates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_plantilla VARCHAR(100) NOT NULL,  
+    categoria ENUM('MARKETING', 'AUTENTICACION', 'SERVICIO') NOT NULL,
+    cuerpo TEXT NOT NULL,  -- Texto base con variables {{1}}, {{2}}, etc.
+    idioma VARCHAR(10) DEFAULT 'es',  -- Código de idioma: es_MX, en_US, etc.
+    estado ENUM('PENDIENTE', 'APROBADA', 'RECHAZADA') DEFAULT 'PENDIENTE',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+

@@ -1,76 +1,121 @@
 <?php
+
 require __DIR__ . '/vendor/autoload.php';
 
-// Cargar el archivo .env
+// Cargar variables de entorno
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
+$dotenv->required(['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID']);
 
-$token = $_ENV['token'] ?? null;
-if (!$token) {
-    echo json_encode(["status" => "error", "message" => "Token no disponible"]);
-    exit;
-}
+$token = $_ENV['WHATSAPP_API_TOKEN'];
+$phoneNumberId = $_ENV['WHATSAPP_PHONE_NUMBER_ID'];
 
-// Obtener los datos que nos mandan
-$numero_destino = $_POST['numero_destino'] ?? null;
-$mensaje = $_POST['mensaje'] ?? null;
+$numero_destino = '523325921540s'; // Número en formato internacional sin '+'
+$cuerpo_mensaje = 'Hola, este es un mensaje de prueba desde PHP usando texto plano.';
 
-if (!$numero_destino || !$mensaje) {
-    echo json_encode(["status" => "error", "message" => "Faltan parámetros"]);
-    exit;
-}
+$resultado = enviarMensajeWhatsApp($numero_destino, $cuerpo_mensaje, $token, $phoneNumberId);
+print_r($resultado);
 
-$accessToken = $token;
-$phoneNumberId = "328945330313492";
+// Función para enviar mensaje de texto plano
+function enviarMensajeWhatsApp($numero_telefono, $cuerpo_mensaje, $token, $phoneNumberId)
+{
+    $message = [
+        'messaging_product' => 'whatsapp',
+        'to' => $numero_telefono,
+        'type' => 'text',
+        'text' => [
+            'body' => $cuerpo_mensaje
+        ]
+    ];
 
-$message = [
-    'messaging_product' => 'whatsapp',
-    'to' => $numero_destino,
-    'type' => 'text',
-    'text' => ['body' => $mensaje]
-];
+    $headers = [
+        "Authorization: Bearer $token",
+        "Content-Type: application/json"
+    ];
 
-$headers = [
-    'Authorization: Bearer ' . $accessToken,
-    'Content-Type: application/json'
-];
+    $url = "https://graph.facebook.com/v22.0/$phoneNumberId/messages";
 
-// Configurar CURL
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://graph.facebook.com/v20.0/$phoneNumberId/messages");
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-$response = curl_exec($ch);
-
-// Manejar errores de CURL
-if (curl_errno($ch)) {
-    $error_msg = curl_error($ch);
-    file_put_contents('error_log.txt', $error_msg . PHP_EOL, FILE_APPEND);
-    echo json_encode(["status" => "error", "message" => "Error en CURL"]);
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curl_error = curl_error($ch);
     curl_close($ch);
-    exit;
+
+    return [
+        'response' => $response,
+        'http_code' => $http_code,
+        'curl_error' => $curl_error
+    ];
 }
 
-curl_close($ch);
 
-// Decodificar respuesta de Facebook
-$responseData = json_decode($response, true);
 
-// Manejar errores de Facebook
-if (isset($responseData['error'])) {
-    echo json_encode(["status" => "error", "message" => $responseData['error']['message']]);
-    exit;
-}
+// function obtenerPlantillaDesdeDB($nombre_plantilla)
+// {
+//     $db = new PDO('mysql:host=localhost;dbname=tu_db', 'usuario', 'contraseña');
+//     $stmt = $db->prepare("SELECT * FROM whatsapp_templates WHERE nombre_plantilla = ? AND estado = 'APROBADA'");
+//     $stmt->execute([$nombre_plantilla]);
+//     return $stmt->fetch(PDO::FETCH_ASSOC);
+// }
 
-// Mensaje enviado correctamente
-if (isset($responseData['messages'][0]['id'])) {
-    echo json_encode(["status" => "success", "message_id" => $responseData['messages'][0]['id']]);
-} else {
-    echo json_encode(["status" => "error", "message" => "Mensaje no enviado correctamente"]);
-}
+// // Uso:
+// $plantilla = obtenerPlantillaDesdeDB('confirmacion_pedido');
+// if (!$plantilla) {
+//     die("Plantilla no encontrada o no aprobada.");
+// }
 
-// Opcional: guardar la respuesta en un archivo de log
-file_put_contents('response_log.txt', $response . PHP_EOL, FILE_APPEND);
+// function enviarPlantillaDesdeDB($numero_telefono, $nombre_plantilla, $variables, $token, $phoneNumberId)
+// {
+//     $plantilla = obtenerPlantillaDesdeDB($nombre_plantilla);
+
+//     $message = [
+//         'messaging_product' => 'whatsapp',
+//         'to' => $numero_telefono,
+//         'type' => 'template',
+//         'template' => [
+//             'name' => $plantilla['nombre_plantilla'],
+//             'language' => ['code' => $plantilla['idioma']],
+//             'components' => [
+//                 [
+//                     'type' => 'body',
+//                     'parameters' => array_map(function ($var) {
+//                         return ['type' => 'text', 'text' => $var];
+//                     }, $variables)
+//                 ]
+//             ]
+//         ]
+//     ];
+
+//     // Resto del código de cURL (igual que antes)...
+//     $headers = ["Authorization: Bearer $token", "Content-Type: application/json"];
+//     $url = "https://graph.facebook.com/v22.0/$phoneNumberId/messages";
+
+//     $ch = curl_init();
+//     curl_setopt($ch, CURLOPT_URL, $url);
+//     curl_setopt($ch, CURLOPT_POST, true);
+//     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($message));
+//     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+//     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+//     $response = curl_exec($ch);
+//     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+//     curl_close($ch);
+
+//     return json_decode($response, true);
+// }
+
+// // Uso:
+// $resultado = enviarPlantillaDesdeDB(
+//     '523325921540',
+//     'confirmacion_pedido',
+//     ['Juan', 'ORD-12345', '25/05/2024'],
+//     $token,
+//     $phoneNumberId
+// );
+// print_r($resultado);
